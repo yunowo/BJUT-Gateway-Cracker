@@ -107,3 +107,11 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+.idea/encodings.xml
+.idea/.name
+ok.txt
+.idea/workspace.xml
+dic.txt
+.idea/modules.xml
+.idea/misc.xml
+.idea/20151223 bjutlgn.iml
