@@ -6,13 +6,16 @@ import json
 import requests
 from html.parser import HTMLParser
 
+requests.adapters.DEFAULT_RETRIES = 5
+
 # this global variable is used to avoid SSL cert verify fail when fiddler is used
 fiddler_ssl = False
 
 # I cannot log in automatically, so I put this usable cookie here
 # this cookie can be reproduced by explorer and caught by fiddler
 # this really sucks, but it's the only solution by now
-test_cookie = 'JSESSIONID=148E69F9174D3554D3EC92C527D6F66C'
+test_cookie = 'JSESSIONID=F12C8E1CB3D6218C617B7ACA33189DDD'
+
 
 
 def is_success(html_res):
@@ -83,8 +86,8 @@ def get_used_traffic():
         def handle_data(self, data):
             if HtmlPar.flg_script and HtmlPar.ct_script == 1:
                 str_idx_s = data.index("';flow='") + 8
-                str_idx_e = data.index("   ';fsele=", str_idx_s)
-                HtmlPar.used_data = data[str_idx_s:str_idx_e]
+                str_idx_e = data.index("';fsele=", str_idx_s)
+                HtmlPar.used_data = data[str_idx_s:str_idx_e].rstrip()
 
     html_url = "https://lgn.bjut.edu.cn/"
     try:
@@ -178,7 +181,7 @@ def get_total_traffic(check_code, u_name, u_pass, html_cookie, s):
     # deal with json
     # print(html_bin)
     dic_json = json.loads(html_bin)
-    return str(int(dic_json['note']['leftFlow'].strip(".00")) * 1024)
+    return str(int(dic_json['note']['leftFlow'].rstrip('0').rstrip('.')) * 1024)
 
 
 if __name__ == '__main__':
