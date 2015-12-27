@@ -124,16 +124,21 @@ def get_check_code(s):
                 HtmlPar.check_code = data[str_idx_s:str_idx_e]
 
     # Get check code
+    html_url = "https://jfself.bjut.edu.cn/"
+    html_cookie = ""
+    try:
+        html_res = s.get(html_url, headers={'Connection': 'Keep-Alive', 'Cookie': html_cookie}, verify=not fiddler_ssl)
+    except:
+        print("Failed to get session.")
+        return -1
+    html_cookie=html_res.headers['Set-Cookie'].strip("; Path=/; HttpOnly")
+	
     html_url = "https://jfself.bjut.edu.cn/nav_login"
-    html_cookie = test_cookie
     try:
         html_res = s.get(html_url, headers={'Connection': 'Keep-Alive', 'Cookie': html_cookie}, verify=not fiddler_ssl)
     except:
         print("Failed to get check code.")
         return -1
-
-    # this doesn't work, i can only use the old cookie
-    # html_cookie=html_res.headers['Set-Cookie'].strip("; Path=/; HttpOnly")
     html_par = HtmlPar()
     html_par.feed(html_res.text)
     return html_par.check_code, html_cookie
