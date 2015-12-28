@@ -141,6 +141,13 @@ def get_check_code(s):
         return -1
     html_par = HtmlPar()
     html_par.feed(html_res.text)
+    
+    html_url = "https://jfself.bjut.edu.cn/RandomCodeAction.action"
+    try:
+        html_res = s.get(html_url, headers={'Connection': 'Keep-Alive', 'Cookie': html_cookie}, verify=not fiddler_ssl)
+    except:
+        print("Failed to get useless random image.")
+        return -1
     return html_par.check_code, html_cookie
 
 
