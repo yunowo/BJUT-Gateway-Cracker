@@ -9,7 +9,7 @@
   
   
 目前的版本存在不能全自动登录的问题  
-![](http://i4.tietuku.com/4a0f53b1558c94ce.png)  
+![](https://github.com/SykieChen/BJUT-Gateway-Cracker/blob/master/img/1.png)  
   
 如图，后台的登录请求分为两个包。第一个包返回一个随机的验证码，如果 session 超时会在 cookie 里返回一个新的 session ID。  
 第二个包用这个 session ID 和随机码加上用户名密码去认证。  
