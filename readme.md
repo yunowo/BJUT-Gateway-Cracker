@@ -8,7 +8,7 @@
 2.0版本还可以自动登录后台获取套餐总流量和已使用流量，防止给别人造成经济损失。  
   
   
-~~目前的版本存在不能全自动登录的问题~~
+~~目前的版本存在不能全自动登录的问题~~  
 ![](https://github.com/SykieChen/BJUT-Gateway-Cracker/blob/master/img/1.png)  
   
 如图，后台的登录请求分为两个包。第一个包返回一个随机的验证码，如果 session 超时会在 cookie 里返回一个新的 session ID。  
